@@ -3,6 +3,8 @@
 # E-mail: wenyi.tang@intel.com
 # Welcome to LoSealL's C++ middle-ware
 ###########################################
+#  - scripts
+#
 #  - ll_codec
 #
 #  - ll_graphic
@@ -15,10 +17,27 @@ string(TIMESTAMP date %Y%m%d)
 string(APPEND version ".${date}")
 project(libll VERSION ${version})
 message("-- libll version: ${version}")
+# update submodule
+macro(update_submodule dir)
+  find_package(Git REQUIRED)
+  if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
+    # Update submodules as needed
+    message(STATUS "updating submodule ${dir}")
+    execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init ${dir}
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                    RESULT_VARIABLE GIT_SUBMOD_RESULT)
+    if(NOT GIT_SUBMOD_RESULT EQUAL "0")
+      message(FATAL_ERROR "git submodule update --init failed with ${GIT_SUBMOD_RESULT}, please checkout submodules")
+    endif()
+  endif()  
+endmacro(update_submodule)
 
 # enable folder scope in ide
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 cmake_policy(SET CMP0074 NEW)
+if(NOT EXISTS ${PROJECT_SOURCE_DIR}/scripts/.git)
+  update_submodule(scripts)
+endif()
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/scripts/cmake)
 include(msvc_helper)
 # Set default output dir
@@ -44,10 +63,16 @@ if(LL_BUILD_TESTS)
 endif()
 
 if(LL_BUILD_CODEC)
+  if(NOT EXISTS ${PROJECT_SOURCE_DIR}/ll_codec/.git)
+    update_submodule(ll_codec)
+  endif()
   add_subdirectory(ll_codec)
 endif()
 
 if(LL_BUILD_GFX)
+  if(NOT EXISTS ${PROJECT_SOURCE_DIR}/ll_graphic/.git)
+    update_submodule(ll_graphic)
+  endif()
   add_subdirectory(ll_graphic)
 endif()
 
