@@ -38,7 +38,7 @@ cmake_policy(SET CMP0074 NEW)
 if(NOT EXISTS ${PROJECT_SOURCE_DIR}/scripts/.git)
   update_submodule(scripts)
 endif()
-list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/scripts/cmake)
+add_subdirectory(scripts)
 include(msvc_helper)
 # Set default output dir
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib CACHE PATH "lib dir")
