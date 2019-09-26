@@ -13,6 +13,7 @@
 
 cmake_minimum_required(VERSION 3.14.2)
 file(STRINGS version version)
+list(GET version 0 version)
 string(TIMESTAMP date %Y%m%d)
 string(APPEND version ".${date}")
 project(libll VERSION ${version})
